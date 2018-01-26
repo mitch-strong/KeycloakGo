@@ -18,7 +18,7 @@ var once sync.Once
 //GetInstance returns a new logger to a file
 func GetInstance() *logger {
 	once.Do(func() {
-		logs = createLogger("UserLogs.txt")
+		logs = createLogger("UserLogs.log")
 	})
 	return logs
 }
