@@ -2,7 +2,9 @@ package keycloak
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"golang.org/x/oauth2"
@@ -45,13 +47,19 @@ func HandleLoginCallback(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 	//Sends the token to get user info
 	response, err := client.Do(req)
+	body, err := ioutil.ReadAll(response.Body)
+	var f interface{}
+	json.Unmarshal(body, &f)
+	m := f.(map[string]interface{})
+	username := m["preferred_username"].(string)
+
 	//Checks if token and authentication were successful
 	if err != nil || response.Status != "200 OK" {
 		//forwards back to login if not successful
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 	} else {
 		//forwards to index if login sucessful
-		logAction(actionLogin)
+		logAction(username, actionLogin)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 	return
@@ -76,7 +84,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		} else {
 			//Go to redirect if token is still valid
-			logAction(actionPageAccess)
+			logAction("", actionPageAccess)
 			next.ServeHTTP(w, r)
 		}
 	})
@@ -89,7 +97,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	//Makes the logout page redirect to login page
 	URI := server + "/login"
 	//Logout using endpoint and redirect to login page
-	logAction(actionLogout)
+	logAction("", actionLogout)
 	http.Redirect(w, r, keycloakserver+"/auth/realms/"+realm+"/protocol/openid-connect/logout?redirect_uri="+URI, http.StatusTemporaryRedirect)
 
 }

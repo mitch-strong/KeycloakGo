@@ -32,9 +32,9 @@ func createLogger(fname string) *logger {
 	}
 }
 
-func logAction(a action) {
+func logAction(username string, a action) {
 	event := getAction(a)
-	userLog.Println(event)
+	userLog.Println(username+": %q", event)
 }
 
 func getAction(a action) Action {
