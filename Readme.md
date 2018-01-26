@@ -1,0 +1,1 @@
+# Keycloak Oauth2 Plugin Adapter for GOLANG
