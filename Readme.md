@@ -12,4 +12,4 @@ To create a connection with your keycloak client you will need add the 'Keycloak
 This file can be found in the Keycloak Console in **Clients &rarr; <$ClientName> &rarr; Installation**
 
 ## Usage
-For usage of this plugin see [Documentation](../blob/master/USAGE.md)
+For usage of this plugin see [Documentation](../master/USAGE.md)
