@@ -59,7 +59,7 @@ func HandleLoginCallback(w http.ResponseWriter, r *http.Request) {
 		m := f.(map[string]interface{})
 		username := m["preferred_username"].(string)
 		//forwards to index if login sucessful
-		logAction(username, actionLogin)
+		logAction(username, actionLogin, "")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 	return
@@ -89,7 +89,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			m := f.(map[string]interface{})
 			username := m["preferred_username"].(string)
 			//Go to redirect if token is still valid
-			logAction(username, actionPageAccess)
+			logAction(username, actionPageAccess, r.URL.RawPath)
 			next.ServeHTTP(w, r)
 		}
 	})
@@ -116,7 +116,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		m := f.(map[string]interface{})
 		username := m["preferred_username"].(string)
 		//Go to redirect if token is still valid
-		logAction(username, actionLogout)
+		logAction(username, actionLogout, "")
 	}
 	//Makes the logout page redirect to login page
 	URI := server + "/login"
