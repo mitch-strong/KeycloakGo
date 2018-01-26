@@ -6,9 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
-	"path/filepath"
-	"runtime"
 
 	oidc "github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
@@ -67,10 +64,8 @@ func Init(keycloakServer, Server string) {
 }
 
 func getKeycloakJSON() {
-	_, filename, _, _ := runtime.Caller(1)
-	path, _ := filepath.Abs(path.Dir(filename))
 
-	jsonFile, err := os.Open(path + "/json/" + keycloakJSONFileName)
+	jsonFile, err := os.Open("./json/" + keycloakJSONFileName)
 	if err != nil {
 		fmt.Print(err)
 	}
