@@ -24,7 +24,7 @@ func GetInstance() *logger {
 }
 
 func createLogger(fname string) *logger {
-	file, _ := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_APPEND, 0777)
+	file, _ := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 
 	return &logger{
 		filename: fname,
