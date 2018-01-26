@@ -11,3 +11,20 @@ type Client struct {
 type Creds struct {
 	Secret string `json:"secret"`
 }
+
+type action int
+
+const (
+	actionLogin action = iota
+	actionLogout
+	actionPageAccess
+	actionInvalid
+)
+
+type Action string
+
+var (
+	ActionLogin      Action = "Login"
+	ActionLogout     Action = "Logout"
+	ActionPageAccess Action = "Access"
+)

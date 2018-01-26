@@ -51,6 +51,7 @@ func HandleLoginCallback(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 	} else {
 		//forwards to index if login sucessful
+		logAction(actionLogin)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 	return
@@ -75,6 +76,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		} else {
 			//Go to redirect if token is still valid
+			logAction(actionPageAccess)
 			next.ServeHTTP(w, r)
 		}
 	})
@@ -87,6 +89,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	//Makes the logout page redirect to login page
 	URI := server + "/login"
 	//Logout using endpoint and redirect to login page
+	logAction(actionLogout)
 	http.Redirect(w, r, keycloakserver+"/auth/realms/"+realm+"/protocol/openid-connect/logout?redirect_uri="+URI, http.StatusTemporaryRedirect)
 
 }
