@@ -25,7 +25,7 @@ var verifier *oidc.IDTokenVerifier //verifier
 
 //Init begins keycloak server
 func Init(keycloakServer, Server string) {
-	setupLogger()
+	userLog = GetInstance()
 	getKeycloakJSON()
 	keycloakserver = keycloakServer
 	server = Server

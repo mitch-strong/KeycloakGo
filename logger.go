@@ -11,10 +11,11 @@ type logger struct {
 	*log.Logger
 }
 
+var userLog *logger
 var logs *logger
 var once sync.Once
 
-// start loggeando
+//GetInstance returns a new logger to a file
 func GetInstance() *logger {
 	once.Do(func() {
 		logs = createLogger("UserLogs.log")
