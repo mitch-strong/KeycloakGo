@@ -16,25 +16,17 @@ const keycloakJSONFileName = "keycloak.json"
 
 //Global Variables
 var client Client
-
-//Realm is the keycloak realm
-var Realm string
-
-//ClientID is the keycloak ClientID
-var ClientID string
-
-//ClientSecret is the keycloak client secret
-var ClientSecret string
-
-//Oauth2Config is the oath2 config struct
-var Oauth2Config oauth2.Config
+var realm string
+var clientID string
+var clientSecret string
+var oauth2Config oauth2.Config
 var provider *oidc.Provider
 var err error
 var keycloakserver string
 var server string
 
 //Verifier is the oidc Verifier
-var Verifier *oidc.IDTokenVerifier
+var verifier *oidc.IDTokenVerifier
 
 //Init begins keycloak server
 func Init(keycloakServer, Server string) {
@@ -43,16 +35,16 @@ func Init(keycloakServer, Server string) {
 	server = Server
 	ctx := context.Background()
 	//Gets the provider for authentication (keycloak)
-	provider, err = oidc.NewProvider(ctx, keycloakserver+"/auth/realms/"+Realm)
+	provider, err = oidc.NewProvider(ctx, keycloakserver+"/auth/realms/"+realm)
 	if err != nil {
 		fmt.Printf("This is an error with regard to the context: %v", err)
 	}
-	Verifier = provider.Verifier(&oidc.Config{ClientID: ClientID})
+	verifier = provider.Verifier(&oidc.Config{ClientID: clientID})
 
 	// Configure an OpenID Connect aware OAuth2 client.
-	Oauth2Config = oauth2.Config{
-		ClientID:     ClientID,
-		ClientSecret: ClientSecret,
+	oauth2Config = oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
 		RedirectURL:  server + "/loginCallback",
 
 		// Discovery returns the OAuth2 endpoints.
@@ -75,7 +67,7 @@ func getKeycloakJSON() {
 	if client.ID == "" || client.Realm == "" || client.Credentials.Secret == "" {
 		fmt.Printf("Error reading keycloak file")
 	}
-	Realm = client.Realm
-	ClientID = client.ID
-	ClientSecret = client.Credentials.Secret
+	realm = client.Realm
+	clientID = client.ID
+	clientSecret = client.Credentials.Secret
 }

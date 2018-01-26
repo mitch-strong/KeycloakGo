@@ -17,7 +17,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	//create a random string for oath2 verification
 	oauthStateString = randSeq(20)
 	//Uses random gnerated string to verify keyclock security
-	url := Oauth2Config.AuthCodeURL(oauthStateString)
+	url := oauth2Config.AuthCodeURL(oauthStateString)
 	//redirects to loginCallback
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -34,14 +34,14 @@ func HandleLoginCallback(w http.ResponseWriter, r *http.Request) {
 	//Gets the code from keycloak
 	code := r.FormValue("code")
 	//Exchanges code for token
-	token, err = Oauth2Config.Exchange(context.Background(), code)
+	token, err = oauth2Config.Exchange(context.Background(), code)
 	if err != nil {
 		fmt.Printf("Code exchange failed with '%v'\n", err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 	client := &http.Client{}
-	url := keycloakserver + "/auth/realms/" + Realm + "/protocol/openid-connect/userinfo"
+	url := keycloakserver + "/auth/realms/" + realm + "/protocol/openid-connect/userinfo"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 	//Sends the token to get user info
@@ -62,7 +62,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//If running unit tests skip authentication (temp)
 		client := &http.Client{}
-		url := keycloakserver + "/auth/realms/" + Realm + "/protocol/openid-connect/userinfo"
+		url := keycloakserver + "/auth/realms/" + realm + "/protocol/openid-connect/userinfo"
 		req, _ := http.NewRequest("GET", url, nil)
 		if token == nil {
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
@@ -88,6 +88,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	//Makes the logout page redirect to login page
 	URI := server + "/login"
 	//Logout using endpoint and redirect to login page
-	http.Redirect(w, r, keycloakserver+"/auth/realms/"+Realm+"/protocol/openid-connect/logout?redirect_uri="+URI, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, keycloakserver+"/auth/realms/"+realm+"/protocol/openid-connect/logout?redirect_uri="+URI, http.StatusTemporaryRedirect)
 
 }
