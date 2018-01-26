@@ -89,7 +89,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			m := f.(map[string]interface{})
 			username := m["preferred_username"].(string)
 			//Go to redirect if token is still valid
-			logAction(username, actionPageAccess, r.URL.RawPath)
+			logAction(username, actionPageAccess, r.RequestURI)
 			next.ServeHTTP(w, r)
 		}
 	})
