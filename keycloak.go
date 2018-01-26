@@ -2,10 +2,7 @@ package keycloak
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 
 	oidc "github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
@@ -15,18 +12,16 @@ import (
 const keycloakJSONFileName = "keycloak.json"
 
 //Global Variables
-var client Client
-var realm string
-var clientID string
-var clientSecret string
-var oauth2Config oauth2.Config
-var provider *oidc.Provider
-var err error
-var keycloakserver string
-var server string
-
-//Verifier is the oidc Verifier
-var verifier *oidc.IDTokenVerifier
+var client Client                  //Client Object
+var realm string                   //realm string from json file
+var clientID string                //Client ID string from json file
+var clientSecret string            //Client ID sectret from json file
+var oauth2Config oauth2.Config     //oath2Config
+var provider *oidc.Provider        //oidc provider
+var err error                      //generic error object
+var keycloakserver string          //keycloak server string passed from app
+var server string                  //app server string passed from app
+var verifier *oidc.IDTokenVerifier //verifier
 
 //Init begins keycloak server
 func Init(keycloakServer, Server string) {
@@ -53,21 +48,4 @@ func Init(keycloakServer, Server string) {
 		Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
 	}
 
-}
-
-func getKeycloakJSON() {
-
-	jsonFile, err := os.Open("./json/" + keycloakJSONFileName)
-	if err != nil {
-		fmt.Print(err)
-	}
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	jsonFile.Close()
-	json.Unmarshal(byteValue, &client)
-	if client.ID == "" || client.Realm == "" || client.Credentials.Secret == "" {
-		fmt.Printf("Error reading keycloak file")
-	}
-	realm = client.Realm
-	clientID = client.ID
-	clientSecret = client.Credentials.Secret
 }

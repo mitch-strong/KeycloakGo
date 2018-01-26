@@ -8,9 +8,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-var oauthStateString string
-var token *oauth2.Token
+var oauthStateString string //randomly generated state string
+var token *oauth2.Token     //token for keycloak
 
 //HandleLogin is the keycloak login funtion
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
