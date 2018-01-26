@@ -47,17 +47,17 @@ func HandleLoginCallback(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 	//Sends the token to get user info
 	response, err := client.Do(req)
-	body, err := ioutil.ReadAll(response.Body)
-	var f interface{}
-	json.Unmarshal(body, &f)
-	m := f.(map[string]interface{})
-	username := m["preferred_username"].(string)
 
 	//Checks if token and authentication were successful
 	if err != nil || response.Status != "200 OK" {
 		//forwards back to login if not successful
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 	} else {
+		body, _ := ioutil.ReadAll(response.Body)
+		var f interface{}
+		json.Unmarshal(body, &f)
+		m := f.(map[string]interface{})
+		username := m["preferred_username"].(string)
 		//forwards to index if login sucessful
 		logAction(username, actionLogin)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -83,8 +83,13 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			//Go to login if token is no longer valid
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		} else {
+			body, _ := ioutil.ReadAll(response.Body)
+			var f interface{}
+			json.Unmarshal(body, &f)
+			m := f.(map[string]interface{})
+			username := m["preferred_username"].(string)
 			//Go to redirect if token is still valid
-			logAction("", actionPageAccess)
+			logAction(username, actionPageAccess)
 			next.ServeHTTP(w, r)
 		}
 	})
@@ -94,10 +99,28 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 //Logout logs the user out
 func Logout(w http.ResponseWriter, r *http.Request) {
+	client := &http.Client{}
+	url := keycloakserver + "/auth/realms/" + realm + "/protocol/openid-connect/userinfo"
+	req, _ := http.NewRequest("GET", url, nil)
+	if token == nil {
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	//Check if token is still valid
+	response, err := client.Do(req)
+	if response.Status == "200 OK" && err == nil {
+		body, _ := ioutil.ReadAll(response.Body)
+		var f interface{}
+		json.Unmarshal(body, &f)
+		m := f.(map[string]interface{})
+		username := m["preferred_username"].(string)
+		//Go to redirect if token is still valid
+		logAction(username, actionLogout)
+	}
 	//Makes the logout page redirect to login page
 	URI := server + "/login"
 	//Logout using endpoint and redirect to login page
-	logAction("", actionLogout)
 	http.Redirect(w, r, keycloakserver+"/auth/realms/"+realm+"/protocol/openid-connect/logout?redirect_uri="+URI, http.StatusTemporaryRedirect)
 
 }
