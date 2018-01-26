@@ -28,13 +28,13 @@ func createLogger(fname string) *logger {
 
 	return &logger{
 		filename: fname,
-		Logger:   log.New(file, "User Action: ", log.Ldate|log.Ltime),
+		Logger:   log.New(file, "", log.Ldate|log.Ltime),
 	}
 }
 
 func logAction(username string, a action) {
 	event := getAction(a)
-	userLog.Println(username+": %q", event)
+	userLog.Println(username+": ", event)
 }
 
 func getAction(a action) Action {
