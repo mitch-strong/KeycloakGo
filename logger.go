@@ -14,6 +14,8 @@ type logger struct {
 var userLog *logger
 var logs *logger
 var once sync.Once
+var file *os.File
+var fileStat os.FileInfo
 
 //GetInstance returns a new logger to a file
 func GetInstance() *logger {
@@ -24,8 +26,8 @@ func GetInstance() *logger {
 }
 
 func createLogger(fname string) *logger {
-	file, _ := os.OpenFile(fname, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-
+	file, _ = os.OpenFile(fname, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	fileStat, _ = file.Stat()
 	return &logger{
 		filename: fname,
 		Logger:   log.New(file, "", log.Ldate|log.Ltime),
@@ -33,8 +35,12 @@ func createLogger(fname string) *logger {
 }
 
 func logAction(username string, a action, additional string) {
-	event := getAction(a)
-	userLog.Println(username+": ", event, " ", additional)
+	if info, _ := file.Stat(); info == fileStat {
+		event := getAction(a)
+		userLog.Println(username+": ", event, " ", additional)
+	} else {
+		GetInstance()
+	}
 }
 
 func getAction(a action) Action {
