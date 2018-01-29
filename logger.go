@@ -35,7 +35,7 @@ func createLogger(fname string) *logger {
 }
 
 func logAction(username string, a action, additional string) {
-	if info, _ := file.Stat(); info == fileStat {
+	if info, _ := file.Stat(); info.Name() == fileStat.Name() {
 		event := getAction(a)
 		userLog.Println(username+": ", event, " ", additional)
 	} else {
